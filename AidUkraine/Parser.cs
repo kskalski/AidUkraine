@@ -2,9 +2,11 @@
 
 namespace AidUkraine {
     class ModelParser {
+        internal const string CASES_SHEET_NAME = "Cases";
+        internal const string HOSTS_SHEET_NAME = "Host Families";
+
         public List<Data.Case> ParseCases(List<Tuple<int, string[]>> rows) {
-            for (int i = 0; i < rows[0].Item2.Length; ++i)
-                headers_[rows[0].Item2[i]] = i;
+            parse_header(rows);
             var cases = rows.Skip(2).Select(num_row => {
                 var (num, row) = num_row;
                 var c = new Data.Case();
@@ -42,24 +44,24 @@ namespace AidUkraine {
                 var (num, row) = num_row;
                 var h = new Data.Host();
                 h.OriginIndex = num;
-                h.Name = column_for(row, "Name di phillips");
+                h.Name = column_for(row, nameof(h.Name));
                 h.Status = parse_status(column_for(row, nameof(h.Status)));
                 h.PrimaryContact = column_for(row, nameof(h.PrimaryContact));
                 h.OutstandingActions = column_for(row, nameof(h.OutstandingActions));
                 h.Notes = column_for(row, nameof(h.Notes));
                 h.Description = column_for(row, nameof(h.Description));
                 h.LanguagesSpoken = parse_languages(column_for(row, nameof(h.LanguagesSpoken)));
-                h.ContactNumber = column_for(row, nameof(h.ContactNumber));
+                h.PhoneNumber = column_for(row, "Phone number");
                 h.Email = column_for(row, nameof(h.Email));
                 h.FacebookLink = column_for(row, "Facebook link");
                 h.Location = column_for(row, nameof(h.Location));
-                h.WillHostPets = parse_yes_no(column_for(row, "Will host pets?"));
+                h.WillHostPets = parse_yes_no(column_for(row, "Will host pets"));
                 h.WillHostPetsKinds = column_for(row, "What kind of pets");
-                h.WillHostChildren = parse_yes_no(column_for(row, "Will host children?"));
-                h.WillHostChildrenKinds = column_for(row, "What kinds of children?");
+                h.WillHostChildren = parse_yes_no(column_for(row, "Will host children"));
+                h.WillHostChildrenKinds = column_for(row, "What kinds of children");
                 h.WillHostSpecialNeeds = parse_yes_no(column_for(row, "Will host special needs"));
-                h.RoomsAvailable = column_for(row, "Number of rooms available?");
-                h.RegisteredWithGov = parse_yes_no(column_for(row, "Registered on Gov website?"));
+                h.RoomsAvailable = column_for(row, "Number of rooms available");
+                h.RegisteredWithGov = parse_yes_no(column_for(row, "Registered on Gov website"));
                 if (int.TryParse(column_for(row, "Max no of people they can take"), out var max_num_people))
                     h.MaxNumPeople = max_num_people;
                 return h;
@@ -70,10 +72,10 @@ namespace AidUkraine {
         void parse_header(List<Tuple<int, string[]>> rows) {
             var first_row = rows[0].Item2;
             for (int i = 0; i < first_row.Length; ++i)
-                headers_[first_row[i].Trim()] = i;
+                headers_[first_row[i].Trim().ToLower()] = i;
         }
 
-        string column_for(string[] row, string name) {
+        internal int HeaderIndexOf(string name) {
             if (name.IndexOf(' ') < 0) {
                 var name_builder = new StringBuilder();
                 for (int i = 1; i < name.Length; ++i) {
@@ -84,7 +86,11 @@ namespace AidUkraine {
                 name_builder.Append(name[name.Length - 1]);
                 name = name_builder.ToString();
             }
-            var idx = headers_[name];
+            return headers_[name.ToLower()];
+        }
+
+        string column_for(string[] row, string name) {
+            var idx = HeaderIndexOf(name);
             if (row.Length <= idx)
                 return "";
             return row[idx];

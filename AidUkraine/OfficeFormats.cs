@@ -92,8 +92,13 @@ namespace Skalware.Utils {
             for (int r = 1; r <= data.Count; ++r) {
                 var dsrow = data[r - 1];
                 row = excelSheet.CreateRow(r);
-                for (int c = 0; c < dsrow.Length; ++c)
-                    row.CreateCell(c).SetCellValue(dsrow[c]);
+                for (int c = 0; c < dsrow.Length; ++c) {
+                    var cell = row.CreateCell(c);
+                    if (dsrow[c].Contains('!'))
+                        cell.SetCellFormula(dsrow[c]);
+                    else
+                        cell.SetCellValue(dsrow[c]);
+                }
             }
             workbook.Write(output_stream);
         }
