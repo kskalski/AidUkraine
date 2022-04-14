@@ -11,12 +11,12 @@ namespace AidUkraine {
                 var (num, row) = num_row;
                 var c = new Data.Case();
                 c.OriginIndex = num;
+                c.Caseid = column_for(row, nameof(c.Caseid));
                 c.Name = column_for(row, nameof(c.Name));
                 c.CurrentPriority = parse_priority(column_for(row, nameof(c.CurrentPriority)));
                 c.Status = parse_status(column_for(row, nameof(c.Status)));
                 c.SupportPerson = column_for(row, nameof(c.SupportPerson));
                 c.OutstandingActions = column_for(row, nameof(c.OutstandingActions));
-                c.Notes = column_for(row, nameof(c.Notes));
                 c.Description = column_for(row, nameof(c.Description));
                 c.LanguagesSpoken = parse_languages(column_for(row, nameof(c.LanguagesSpoken)));
                 c.ContactNumber = column_for(row, nameof(c.ContactNumber));
@@ -34,7 +34,7 @@ namespace AidUkraine {
                 c.Destination = column_for(row, nameof(c.Destination));
                 c.HostFamily = column_for(row, nameof(c.HostFamily));
                 return c;
-            }).ToList();
+            }).Where(c => c.NumPeopleTotal > 0).ToList();
             return cases;
         }
 
@@ -71,8 +71,14 @@ namespace AidUkraine {
 
         void parse_header(List<Tuple<int, string[]>> rows) {
             var first_row = rows[0].Item2;
-            for (int i = 0; i < first_row.Length; ++i)
-                headers_[first_row[i].Trim().ToLower()] = i;
+            for (int i = 0; i < first_row.Length; ++i) {
+                var name = first_row[i];
+                if (string.IsNullOrWhiteSpace(name))
+                    continue;
+                name = name.Split('-', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).First();
+                name = name.ToLower();
+                headers_[name] = i;
+            }
         }
 
         internal int HeaderIndexOf(string name) {
@@ -86,17 +92,21 @@ namespace AidUkraine {
                 name_builder.Append(name[name.Length - 1]);
                 name = name_builder.ToString();
             }
-            return headers_[name.ToLower()];
+            name = name.ToLower();
+            return headers_[name];
         }
 
         string column_for(string[] row, string name) {
             var idx = HeaderIndexOf(name);
             if (row.Length <= idx)
                 return "";
-            return row[idx];
+            return row[idx].Trim();
         }
 
         static Data.Priority parse_priority(string text) {
+            if (string.IsNullOrWhiteSpace(text))
+                return Data.Priority.None;
+            text = text.Split(new char[] { '/', '-' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).First();
             switch (text) {
                 case nameof(Data.Priority.Low): return Data.Priority.Low;
                 case nameof(Data.Priority.Medium): return Data.Priority.Medium;
@@ -131,6 +141,9 @@ namespace AidUkraine {
 
         static Data.Status parse_status(string text) {
             text = text.Replace(" ", "");
+            if (string.IsNullOrWhiteSpace(text))
+                return Data.Status.None;
+            text = text.Split(new char[] { '/', '-' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).First();
             if (text.Equals(nameof(Data.Status.ToBeContacted), StringComparison.InvariantCultureIgnoreCase))
                 return Data.Status.ToBeContacted;
             if (text.Equals(nameof(Data.Status.SpokenOnPhone), StringComparison.InvariantCultureIgnoreCase))
@@ -139,6 +152,8 @@ namespace AidUkraine {
                 return Data.Status.InProgress;
             if (text.Equals(nameof(Data.Status.Matched), StringComparison.InvariantCultureIgnoreCase))
                 return Data.Status.Matched;
+            if (text.Equals(nameof(Data.Status.PotentialMatch), StringComparison.InvariantCultureIgnoreCase))
+                return Data.Status.PotentialMatch;
             if (text.Equals(nameof(Data.Status.AppliedForVisa), StringComparison.InvariantCultureIgnoreCase))
                 return Data.Status.AppliedForVisa;
             if (text.Equals(nameof(Data.Status.SortingTransport), StringComparison.InvariantCultureIgnoreCase))

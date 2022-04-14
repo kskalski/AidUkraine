@@ -10,13 +10,16 @@ namespace AidUkraine {
         internal List<string[]> TransformMatchesToTextRows(IReadOnlyList<int>[] matches, IReadOnlyList<Data.Case> cases, IReadOnlyList<Data.Host> hosts) {
             var matches_text_rows = new List<string[]>();
             for (int ci = 0; ci < matches.Length; ++ci) {
+                var match = matches[ci];
+                if (match == null)
+                    continue;
                 var case_val = cases[ci];
                 var text_cells = new List<string>() {
                     cases_ref_for(nameof(case_val.Name), case_val.OriginIndex),
                     cases_ref_for(nameof(case_val.Status), case_val.OriginIndex),
                     ":"
                 };
-                foreach (var hi in matches[ci]) {
+                foreach (var hi in match) {
                     var host_val = hosts[hi];
                     text_cells.Add(hosts_ref_for(nameof(host_val.Name), host_val.OriginIndex));
                     text_cells.Add(hosts_ref_for(nameof(host_val.Status), host_val.OriginIndex));

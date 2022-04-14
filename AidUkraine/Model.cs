@@ -11,6 +11,7 @@
         ToBeContacted = 1,
         SpokenOnPhone,
         InProgress,
+        PotentialMatch,
         Matched,
         AppliedForVisa,
         SortingTransport,
@@ -34,12 +35,12 @@
 
     public class Case: IHasStatus {
         public int OriginIndex { get; set; }
+        public string Caseid { get; set; }
         public string Name { get; set; }
         public string SupportPerson { get; set; }
         public Priority CurrentPriority { get; set; }
         public Status Status { get; set; }
         public string OutstandingActions { get; set; }
-        public string Notes { get; set; }
         public string Description { get; set; }
         public string ContactNumber { get; set; }
         public string Email { get; set; }
