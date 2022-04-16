@@ -6,8 +6,8 @@ namespace AidUkraine {
         internal const string HOSTS_SHEET_NAME = "Host Families";
 
         public List<Data.Case> ParseCases(List<Tuple<int, string[]>> rows) {
-            parse_header(rows);
-            var cases = rows.Skip(2).Select(num_row => {
+            parse_header(rows.Skip(2));
+            var cases = rows.Skip(3).Select(num_row => {
                 var (num, row) = num_row;
                 var c = new Data.Case();
                 c.OriginIndex = num;
@@ -17,21 +17,23 @@ namespace AidUkraine {
                 c.Status = parse_status(column_for(row, nameof(c.Status)));
                 c.SupportPerson = column_for(row, nameof(c.SupportPerson));
                 c.OutstandingActions = column_for(row, nameof(c.OutstandingActions));
-                c.Description = column_for(row, nameof(c.Description));
+                c.Description = column_for(row, "description of the group needing help");
                 c.LanguagesSpoken = parse_languages(column_for(row, nameof(c.LanguagesSpoken)));
                 c.ContactNumber = column_for(row, nameof(c.ContactNumber));
                 c.Email = column_for(row, nameof(c.Email));
                 c.FacebookLink = column_for(row, "Facebook link");
                 if (int.TryParse(column_for(row, "Adults"), out var num_adults))
                     c.NumAdults = num_adults;
-                if (int.TryParse(column_for(row, "Children"), out var num_children))
+                if (int.TryParse(column_for(row, "no of children"), out var num_children))
                     c.NumChildren = num_children;
+                if (int.TryParse(column_for(row, nameof(c.TotalNumberOfPeople)), out var num_people))
+                    c.TotalNumberOfPeople = num_people;
                 c.ChildrenAges = parse_ints(split_list(column_for(row, "Ages")));
                 c.HasPets = parse_yes_no(column_for(row, "Pets"));
                 c.PetTypes = column_for(row, "Types");
                 c.HasSpecialNeeds = parse_yes_no(column_for(row, "Special Needs"));
                 c.CurrentLocation = column_for(row, nameof(c.CurrentLocation));
-                c.Destination = column_for(row, nameof(c.Destination));
+                c.WantedDestination = column_for(row, nameof(c.WantedDestination));
                 c.HostFamily = column_for(row, nameof(c.HostFamily));
                 return c;
             }).Where(c => c.NumPeopleTotal > 0).ToList();
@@ -44,13 +46,14 @@ namespace AidUkraine {
                 var (num, row) = num_row;
                 var h = new Data.Host();
                 h.OriginIndex = num;
+                h.HostId = column_for(row, nameof(h.HostId));
                 h.Name = column_for(row, nameof(h.Name));
                 h.Status = parse_status(column_for(row, nameof(h.Status)));
                 h.PrimaryContact = column_for(row, nameof(h.PrimaryContact));
                 h.OutstandingActions = column_for(row, nameof(h.OutstandingActions));
                 h.Notes = column_for(row, nameof(h.Notes));
                 h.Description = column_for(row, nameof(h.Description));
-                h.LanguagesSpoken = parse_languages(column_for(row, nameof(h.LanguagesSpoken)));
+                //h.LanguagesSpoken = parse_languages(column_for(row, nameof(h.LanguagesSpoken)));
                 h.PhoneNumber = column_for(row, "Phone number");
                 h.Email = column_for(row, nameof(h.Email));
                 h.FacebookLink = column_for(row, "Facebook link");
@@ -69,13 +72,13 @@ namespace AidUkraine {
             return cases;
         }
 
-        void parse_header(List<Tuple<int, string[]>> rows) {
-            var first_row = rows[0].Item2;
+        void parse_header(IEnumerable<Tuple<int, string[]>> rows) {
+            var first_row = rows.First().Item2;
             for (int i = 0; i < first_row.Length; ++i) {
                 var name = first_row[i];
                 if (string.IsNullOrWhiteSpace(name))
                     continue;
-                name = name.Split('-', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).First();
+                name = name.Split(new char[] { '-', '/' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).First();
                 name = name.ToLower();
                 headers_[name] = i;
             }
@@ -146,6 +149,8 @@ namespace AidUkraine {
             text = text.Split(new char[] { '/', '-' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).First();
             if (text.Equals(nameof(Data.Status.ToBeContacted), StringComparison.InvariantCultureIgnoreCase))
                 return Data.Status.ToBeContacted;
+            if (text.Equals(nameof(Data.Status.Texted), StringComparison.InvariantCultureIgnoreCase))
+                return Data.Status.Texted;
             if (text.Equals(nameof(Data.Status.SpokenOnPhone), StringComparison.InvariantCultureIgnoreCase))
                 return Data.Status.SpokenOnPhone;
             if (text.Equals(nameof(Data.Status.InProgress), StringComparison.InvariantCultureIgnoreCase))
@@ -156,8 +161,8 @@ namespace AidUkraine {
                 return Data.Status.PotentialMatch;
             if (text.Equals(nameof(Data.Status.AppliedForVisa), StringComparison.InvariantCultureIgnoreCase))
                 return Data.Status.AppliedForVisa;
-            if (text.Equals(nameof(Data.Status.SortingTransport), StringComparison.InvariantCultureIgnoreCase))
-                return Data.Status.SortingTransport;
+            if (text.Equals(nameof(Data.Status.TravelSupport), StringComparison.InvariantCultureIgnoreCase))
+                return Data.Status.TravelSupport;
             if (text.Equals(nameof(Data.Status.Closed), StringComparison.InvariantCultureIgnoreCase))
                 return Data.Status.Closed;
             return Data.Status.None;

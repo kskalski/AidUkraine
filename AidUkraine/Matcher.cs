@@ -4,7 +4,7 @@
         public static IEnumerable<T> FilterStatus<T>(IEnumerable<T> input) where T: Data.IHasStatus {
             return input.Where(x => {
                 var status = x.Status;
-                return status != Data.Status.Matched && status != Data.Status.PotentialMatch && status != Data.Status.SortingTransport &&
+                return status != Data.Status.Matched && status != Data.Status.PotentialMatch && status != Data.Status.TravelSupport &&
                        status != Data.Status.Closed && status != Data.Status.AppliedForVisa;
             });
         }
@@ -14,8 +14,8 @@
                 return false;
             if (c.HasPets && !h.WillHostPets)
                 return false;
-            if (h.LanguagesSpoken.Any(l => SLAVIC_LANGS.Contains(l)) && c.LanguagesSpoken.Contains(Data.Language.ENGLISH))
-                return false;
+            //if (h.LanguagesSpoken.Any(l => SLAVIC_LANGS.Contains(l)) && c.LanguagesSpoken.Contains(Data.Language.ENGLISH))
+            //    return false;
             if (h.MaxNumPeople != null && h.MaxNumPeople < c.NumPeopleTotal)
                 return false;
             return true;

@@ -9,12 +9,13 @@
     public enum Status {
         None = 0,
         ToBeContacted = 1,
+        Texted,
         SpokenOnPhone,
         InProgress,
         PotentialMatch,
         Matched,
         AppliedForVisa,
-        SortingTransport,
+        TravelSupport,
         Closed
     }
 
@@ -48,20 +49,22 @@
         public Language[] LanguagesSpoken { get; set; }
         public int NumAdults { get; set; }
         public int NumChildren { get; set; }
-        public int NumPeopleTotal => NumAdults + NumChildren;
+        public int TotalNumberOfPeople { get; set; }
+        public int NumPeopleTotal => TotalNumberOfPeople > 0 ? TotalNumberOfPeople : (NumAdults + NumChildren);
         public int[] ChildrenAges { get; set; }
         public bool HasPets { get; set; }
         public string PetTypes { get; set; }
         public bool HasSpecialNeeds { get; set; }
         public string CurrentLocation { get; set; }
 
-        public string Destination { get; set; }
+        public string WantedDestination { get; set; }
 
         public string HostFamily { get; set; }
     }
 
     public class Host: IHasStatus {
         public int OriginIndex { get; set; }
+        public string HostId { get; set; }
         public string Name { get; set; }
         public string PrimaryContact { get; set; }
         public Status Status { get; set; }
