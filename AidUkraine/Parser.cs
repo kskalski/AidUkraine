@@ -47,12 +47,12 @@ namespace AidUkraine {
                 var h = new Data.Host();
                 h.OriginIndex = num;
                 h.HostId = column_for(row, nameof(h.HostId));
-                h.Name = column_for(row, nameof(h.Name));
+                h.HostName = column_for(row, nameof(h.HostName));
                 h.Status = parse_status(column_for(row, nameof(h.Status)));
                 h.PrimaryContact = column_for(row, nameof(h.PrimaryContact));
                 h.OutstandingActions = column_for(row, nameof(h.OutstandingActions));
                 h.Notes = column_for(row, nameof(h.Notes));
-                h.Description = column_for(row, nameof(h.Description));
+                h.DescriptionOfOffer = column_for(row, nameof(h.DescriptionOfOffer));
                 //h.LanguagesSpoken = parse_languages(column_for(row, nameof(h.LanguagesSpoken)));
                 h.PhoneNumber = column_for(row, "Phone number");
                 h.Email = column_for(row, nameof(h.Email));
@@ -159,6 +159,8 @@ namespace AidUkraine {
                 return Data.Status.Matched;
             if (text.Equals(nameof(Data.Status.PotentialMatch), StringComparison.InvariantCultureIgnoreCase))
                 return Data.Status.PotentialMatch;
+            if (text.Equals(nameof(Data.Status.BeingMatched), StringComparison.InvariantCultureIgnoreCase))
+                return Data.Status.BeingMatched;
             if (text.Equals(nameof(Data.Status.AppliedForVisa), StringComparison.InvariantCultureIgnoreCase))
                 return Data.Status.AppliedForVisa;
             if (text.Equals(nameof(Data.Status.TravelSupport), StringComparison.InvariantCultureIgnoreCase))

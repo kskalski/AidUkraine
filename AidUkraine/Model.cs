@@ -12,6 +12,7 @@
         Texted,
         SpokenOnPhone,
         InProgress,
+        BeingMatched,
         PotentialMatch,
         Matched,
         AppliedForVisa,
@@ -65,12 +66,12 @@
     public class Host: IHasStatus {
         public int OriginIndex { get; set; }
         public string HostId { get; set; }
-        public string Name { get; set; }
+        public string HostName { get; set; }
         public string PrimaryContact { get; set; }
         public Status Status { get; set; }
         public string OutstandingActions { get; set; }
         public string Notes { get; set; }
-        public string Description { get; set; }
+        public string DescriptionOfOffer { get; set; }
         public Language[] LanguagesSpoken { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }

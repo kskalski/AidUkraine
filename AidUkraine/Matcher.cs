@@ -4,7 +4,7 @@
         public static IEnumerable<T> FilterStatus<T>(IEnumerable<T> input) where T: Data.IHasStatus {
             return input.Where(x => {
                 var status = x.Status;
-                return status != Data.Status.Matched && status != Data.Status.PotentialMatch && status != Data.Status.TravelSupport &&
+                return status != Data.Status.Matched && status != Data.Status.PotentialMatch && status != Data.Status.BeingMatched && status != Data.Status.TravelSupport &&
                        status != Data.Status.Closed && status != Data.Status.AppliedForVisa;
             });
         }

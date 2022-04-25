@@ -23,7 +23,7 @@ namespace AidUkraine {
                 foreach (var hi in match) {
                     var host_val = hosts[hi];
                     text_cells.Add(host_val.HostId);
-                    text_cells.Add(hosts_ref_for(nameof(host_val.Name), host_val.OriginIndex));
+                    text_cells.Add(hosts_ref_for(nameof(host_val.HostName), host_val.OriginIndex));
                     text_cells.Add(hosts_ref_for(nameof(host_val.Status), host_val.OriginIndex));
                 }
                 matches_text_rows.Add(text_cells.ToArray());
