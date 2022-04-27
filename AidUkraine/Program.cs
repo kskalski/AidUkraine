@@ -1,6 +1,11 @@
-﻿var input_path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Help For Refugees Database.xlsx");
+﻿
+var data = await Skalware.Utils.OfficeFormats.ReadGoogleSpreadsheet(
+    Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "aid-ukraine-credentials.json"),
+    File.ReadAllText(Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "aid-ukraine-spreadsheet-id.txt")).Trim());
 
-var data = Skalware.Utils.OfficeFormats.ReadExcelFile(input_path);
+//var input_path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Help For Refugees Database.xlsx");
+
+//var data_old = Skalware.Utils.OfficeFormats.ReadExcelFile(input_path);
 var cases_parser = new AidUkraine.ModelParser(); 
 var cases = AidUkraine.Matcher.FilterStatus(
     cases_parser.ParseCases(data[AidUkraine.ModelParser.CASES_SHEET_NAME]))
