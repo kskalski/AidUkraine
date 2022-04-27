@@ -57,6 +57,7 @@
         public string PetTypes { get; set; }
         public bool HasSpecialNeeds { get; set; }
         public string CurrentLocation { get; set; }
+        public bool? Smoker { get; set; }
 
         public string WantedDestination { get; set; }
 
@@ -85,5 +86,6 @@
         public string RoomsAvailable { get; set; }
         public bool RegisteredWithGov { get; set; }
         public int? MaxNumPeople { get; set; }
+        public bool? SmokerInHouse { get; set; }
     }
 }

@@ -16,6 +16,8 @@
                 return false;
             //if (h.LanguagesSpoken.Any(l => SLAVIC_LANGS.Contains(l)) && c.LanguagesSpoken.Contains(Data.Language.ENGLISH))
             //    return false;
+            if (c.Smoker != null && h.SmokerInHouse != null)
+                return c.Smoker == h.SmokerInHouse;
             if (h.MaxNumPeople != null && h.MaxNumPeople < c.NumPeopleTotal)
                 return false;
             return true;

@@ -32,6 +32,7 @@ namespace AidUkraine {
                 c.HasPets = parse_yes_no(column_for(row, "Pets"));
                 c.PetTypes = column_for(row, "Types");
                 c.HasSpecialNeeds = parse_yes_no(column_for(row, "Special Needs"));
+                c.Smoker = parse_yes_no_empty(column_for(row, nameof(c.Smoker)));
                 c.CurrentLocation = column_for(row, nameof(c.CurrentLocation));
                 c.WantedDestination = column_for(row, nameof(c.WantedDestination));
                 c.HostFamily = column_for(row, nameof(c.HostFamily));
@@ -65,6 +66,7 @@ namespace AidUkraine {
                 h.WillHostSpecialNeeds = parse_yes_no(column_for(row, "Will host special needs"));
                 h.RoomsAvailable = column_for(row, "Number of rooms available");
                 h.RegisteredWithGov = parse_yes_no(column_for(row, "Registered on Gov website"));
+                h.SmokerInHouse = parse_yes_no_empty(column_for(row, nameof(h.SmokerInHouse)));
                 if (int.TryParse(column_for(row, "Max no of people they can take"), out var max_num_people))
                     h.MaxNumPeople = max_num_people;
                 return h;
@@ -78,7 +80,7 @@ namespace AidUkraine {
                 var name = first_row[i];
                 if (string.IsNullOrWhiteSpace(name))
                     continue;
-                name = name.Split(new char[] { '-', '/' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).First();
+                name = name.Split(new char[] { '-', '/', '(', ')' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).First();
                 name = name.ToLower();
                 headers_[name] = i;
             }
@@ -109,7 +111,7 @@ namespace AidUkraine {
         static Data.Priority parse_priority(string text) {
             if (string.IsNullOrWhiteSpace(text))
                 return Data.Priority.None;
-            text = text.Split(new char[] { '/', '-' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).First();
+            text = text.Split(new char[] { '/', '-', '(', ')' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).First();
             switch (text) {
                 case nameof(Data.Priority.Low): return Data.Priority.Low;
                 case nameof(Data.Priority.Medium): return Data.Priority.Medium;
@@ -173,7 +175,7 @@ namespace AidUkraine {
         static string[] split_list(string txt) {
             if (string.IsNullOrWhiteSpace(txt))
                 return Array.Empty<string>();
-            return txt.Split(new char[] { ' ', ',', '(', ')' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return txt.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         }
         static int[] parse_ints(string[] vals) {
             var result = new List<int>();
@@ -184,6 +186,11 @@ namespace AidUkraine {
         }
         static bool parse_yes_no(string txt) {
             return txt != null && txt.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
+        }
+        static bool? parse_yes_no_empty(string txt) {
+            if (string.IsNullOrWhiteSpace(txt))
+                return null;
+            return txt.StartsWith("y", StringComparison.InvariantCultureIgnoreCase);
         }
 
         Dictionary<string, int> headers_ = new();
