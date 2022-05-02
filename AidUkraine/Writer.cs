@@ -33,19 +33,21 @@ namespace AidUkraine {
 
         string cases_ref_for(string name, int row_index) {
             char letter = (char)('A' + cases_parser_.HeaderIndexOf(name));
-            return $"'{ModelParser.CASES_SHEET_NAME}'!{letter}{row_index}";
+            return $"='{ModelParser.CASES_SHEET_NAME}'!{letter}{row_index}";
         }
         string hosts_ref_for(string name, int row_index) {
             char letter = (char)('A' + hosts_parser_.HeaderIndexOf(name));
-            return $"'{ModelParser.HOSTS_SHEET_NAME}'!{letter}{row_index}";
+            return $"='{ModelParser.HOSTS_SHEET_NAME}'!{letter}{row_index}";
         }
 
         internal void SaveOutput(IReadOnlyList<string[]> text_rows) {
             var date_str = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture.DateTimeFormat.SortableDateTimePattern).Substring(0, 13);
-            var output_path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Personal), $"Generated matches.{date_str}.xlsx");
-            var text_header = new string[] { "Case Id", "Case name", "Case status", "", "Host1 Id", "Host1 name", "Host1 status", "Host2 Id", "Host2 name", "Host2 status", "..." };
-            Skalware.Utils.OfficeFormats.SaveExcelFile(output_path, text_header, text_rows);
+            var output_path = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Personal), $"{OUTPUT_SHEET_NAME}.{date_str}.xlsx");
+            Skalware.Utils.OfficeFormats.SaveExcelFile(output_path, OUTPUT_HEADERS, text_rows);
         }
+
+        public static readonly string[] OUTPUT_HEADERS = new string[] { "Case Id", "Case name", "Case status", "", "Host1 Id", "Host1 name", "Host1 status", "Host2 Id", "Host2 name", "Host2 status", "..." };
+        public const string OUTPUT_SHEET_NAME = "Generated matches";
 
         ModelParser cases_parser_;
         ModelParser hosts_parser_;

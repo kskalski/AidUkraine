@@ -1,6 +1,7 @@
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
+using Google.Apis.Sheets.v4.Data;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.XWPF.UserModel;
@@ -107,13 +108,7 @@ namespace Skalware.Utils {
         }
 
         public static async Task<IDictionary<string, List<Tuple<int, string[]>>>> ReadGoogleSpreadsheet(string credentials_path, string spreadsheet_id) {
-            var credential = await ReadGoogleCredentials(credentials_path);
-
-            // Create Google Sheets API service.
-            var service = new SheetsService(new BaseClientService.Initializer() {
-                HttpClientInitializer = credential,
-                ApplicationName = "AidUkraine",
-            });
+            var service = await CreateSheetsService(credentials_path, needs_write: false);
 
             var request = service.Spreadsheets.Get(spreadsheet_id);
             var response = await request.ExecuteAsync();
@@ -155,10 +150,36 @@ namespace Skalware.Utils {
             return dict;
         }
 
-        static async Task<GoogleCredential> ReadGoogleCredentials(string credentials_path) {
+        public async static Task UpdateGoogleSpreadsheet(string credentials_path, string spreadsheet_id, string sheet_name, string[] header, IReadOnlyList<string[]> data) {
+            var service = await CreateSheetsService(credentials_path, needs_write: true);
+
+            var value_range = new ValueRange();
+//            value_range.Range = "A1:Z1000";
+            value_range.Values = new List<IList<object>>();
+            value_range.Values.Add(header);
+            foreach (var row in data)
+                value_range.Values.Add(row);
+            var request = service.Spreadsheets.Values.Update(value_range, spreadsheet_id, $"{sheet_name}!A1:Z1000");
+            request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+            var response = await request.ExecuteAsync();
+            Console.WriteLine("Updated spreadsheet range {0}", response.UpdatedRange);
+        }
+
+        static async Task<SheetsService> CreateSheetsService(string credentials_path, bool needs_write) {
+            var credential = await ReadGoogleCredentials(credentials_path, needs_write);
+
+            // Create Google Sheets API service.
+            var service = new SheetsService(new BaseClientService.Initializer() {
+                HttpClientInitializer = credential,
+                ApplicationName = "AidUkraine",
+            });
+            return service;
+        }
+
+        static async Task<GoogleCredential> ReadGoogleCredentials(string credentials_path, bool needs_write) {
             using var stream = new FileStream(credentials_path, FileMode.Open, FileAccess.Read);
             var raw_credentials = await GoogleCredential.FromStreamAsync(stream, CancellationToken.None);
-            string[] scopes = { SheetsService.Scope.SpreadsheetsReadonly };
+            string[] scopes = { needs_write ? SheetsService.Scope.Spreadsheets : SheetsService.Scope.SpreadsheetsReadonly };
             return raw_credentials.CreateScoped(scopes);
         }
     }
