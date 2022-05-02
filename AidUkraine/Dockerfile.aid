@@ -1,0 +1,15 @@
+# Base of your container
+FROM mcr.microsoft.com/dotnet/runtime:6.0-alpine3.15
+
+RUN apk update && apk add icu-libs libc6-compat tzdata
+ENV LD_LIBRARY_PATH /lib64
+# Disable the invariant mode (set in base image)
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
+WORKDIR /app
+
+# Copy the project into folder and then restore packages
+COPY . /app/
+RUN rm /app/Dockerfile.aid
+
+ENTRYPOINT ["dotnet", "AidUkraine.dll"]

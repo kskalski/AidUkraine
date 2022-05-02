@@ -1,0 +1,30 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: matcher
+  namespace: aid
+spec:
+  schedule: "15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: matcher
+            image: $K8S_REGISTRY/aid_matcher:20220502_1001
+            args: ['/app/credentials']
+            volumeMounts:
+            - name: credentials
+              mountPath: "/app/credentials"
+            resources:
+              requests:
+                memory: 100Mi
+                cpu: 0.2
+          restartPolicy: OnFailure
+          nodeSelector:
+            kubernetes.io/arch: amd64
+          volumes:
+          - name: credentials
+            secret:
+              secretName: credentials
