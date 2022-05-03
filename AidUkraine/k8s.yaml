@@ -12,7 +12,7 @@ spec:
         spec:
           containers:
           - name: matcher
-            image: $K8S_REGISTRY/aid_matcher:20220502_1001
+            image: $K8S_REGISTRY/aid_matcher:20220503_1500
             args: ['/app/credentials']
             volumeMounts:
             - name: credentials
