@@ -52,7 +52,7 @@ namespace AidUkraine {
                 h.Status = parse_status(column_for(row, nameof(h.Status)));
                 h.PrimaryContact = column_for(row, nameof(h.PrimaryContact));
                 h.OutstandingActions = column_for(row, nameof(h.OutstandingActions));
-                h.Notes = column_for(row, nameof(h.Notes));
+                //h.Notes = column_for(row, nameof(h.Notes));
                 h.DescriptionOfOffer = column_for(row, nameof(h.DescriptionOfOffer));
                 //h.LanguagesSpoken = parse_languages(column_for(row, nameof(h.LanguagesSpoken)));
                 h.PhoneNumber = column_for(row, "Phone number");
